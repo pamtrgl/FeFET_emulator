@@ -6,9 +6,12 @@ Created on Mon March 29 08 :15 :00 2021
 @description : This program aim to recover data from CSV file with multiple
  data source.
 
-@release : 1.1
+@release : 1.2
 
-@release_note : This release includes functions for column and row counting and a function with
+@release_notes : 
+- 1.2 : This release includes functions for saving X and Y data in the same file and separate them
+ from others data.
+- 1.1 : This release includes functions for column and row counting and a function with
  parameters to be use with different file.
 """
 
@@ -64,17 +67,17 @@ def row_counter(filename, delim=','):
     return(csvReader.line_num)
 
 """ ----------------------------------------------------------------------
-@name : row_counter
+@name : recover_data
 
 @param :
     - filname (str) : filename or path
     - nb_row (int) : number of row (default: 1)
-    - nb_col (int) : number of row (default: 1)
+    - nb_col (int) : number of row (default: 2)
     - delim : delimiter of the data (default: ',')
 
 @description : function to recover data and save figures.
 ----------------------------------------------------------------------- """
-def recover_data(filename, nb_row=1, nb_col=1, delim=','):
+def recover_data(filename, nb_row=1, nb_col=2, delim=','):
 
     nb_col = int(nb_col/2)
 
@@ -113,15 +116,61 @@ def recover_data(filename, nb_row=1, nb_col=1, delim=','):
         plt.title(figFileName)
         # plt.show()    # checking figures
         plt.savefig(figFileName)
-        plt.clf()
+        plt.clf()       # clear figure
+
+""" ----------------------------------------------------------------------
+@name : save_data_txt
+
+@param :
+    - filname (str) : filename or path
+    - nb_row (int) : number of row (default: 1)
+    - nb_col (int) : number of row (default: 2)
+    - delim : delimiter of the data (default: ',')
+
+@description : function to recover data and save figures.
+----------------------------------------------------------------------- """
+def save_data_txt(filename, nb_row=1, nb_col=2, delim=','):
+    nb_col = int(nb_col/2)
+
+    with open(r"C:\Users\pmatrangolo\Documents\FeFET_model\models\data_XOR\carac_xor.csv", newline='') as csvfile:
+        for row in csv.reader(csvfile, dialect='excel', delimiter=','):
+            for i in range(0, len(row), 2):
+                valuesX.append(row[i])
+                valuesY.append(row[i+1])
+
+    for i in range(0, nb_col, 1):
+        for j in range(0, nb_row, 1):
+            prePlotTabX.append(valuesX[i + j*nb_col])
+            prePlotTabY.append(valuesY[i + j*nb_col])
+
+    # print(prePlotTabX[0: 1443],"\n")
+    # print(prePlotTabY[0: 1443],"\n")
+
+    #-- saving txt file
+    for i in range(0, nb_col, 1):
+        # naming txt file
+        tabFileName = str(prePlotTabX[i*nb_row]) + "_-_" + str(prePlotTabY[i*nb_row]) + ".txt"
+        tabFileName = tabFileName.replace(':', '_')
+        tabFileName = tabFileName.replace('/', '_')
+        tabFileName = tabFileName.replace(' ', '')
+        tabTitle = str(prePlotTabX[i*nb_row]) + "," + str(prePlotTabY[i*nb_row] + "\n")
+
+        with open(tabFileName, 'w') as f:
+            f.write(tabTitle)
+            for j in range(1 + i*nb_col, nb_row + i*nb_col, 1):
+                data = str(prePlotTabX[j]) + "," + str(prePlotTabY[j] + "\n")
+                f.write(data)
 
 #-----------------------------------------------------------------------------------------------------------------#
 ####---                                        start of the program                                         ---####
 #-----------------------------------------------------------------------------------------------------------------#
 
 # counting row and line
-nb_row = row_counter(r"C:\Users\pmatrangolo\Documents\FeFET_model\models\carac_Nand.csv")
-nb_col = col_counter(r"C:\Users\pmatrangolo\Documents\FeFET_model\models\carac_Nand.csv")
+#nb_row = row_counter(r"C:\Users\pmatrangolo\Documents\FeFET_model\models\data_XOR\carac_xor.csv")
+#nb_col = col_counter(r"C:\Users\pmatrangolo\Documents\FeFET_model\models\data_XOR\carac_xor.csv")
 
 # recovering data
-recover_data(r"C:\Users\pmatrangolo\Documents\FeFET_model\models\carac_Nand.csv", nb_row, nb_col)
+#recover_data(r"C:\Users\pmatrangolo\Documents\FeFET_model\models\carac_Nand.csv", nb_row, nb_col)
+
+#########
+
